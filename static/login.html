@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Login - Vorlagen Editor</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="/static/template-editor-logo.png" type="image/png">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <img src="/static/template-editor-logo.png" class="logo-img">
+    <h2>Anmelden</h2>
+    <div id="error" class="error hidden"></div>
+    <form id="loginForm">
+      <div class="field"><label>Benutzername</label><input type="text" id="username" required></div>
+      <div class="field"><label>Passwort</label><input type="password" id="password" required></div>
+      <div class="field hidden" id="otpRow"><label>OTP</label><input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code"></div>
+      <div class="form-actions"><button class="btn-primary" type="submit">Anmelden <span id="loginSpinner" class="inline-spinner hidden" aria-hidden="true"></span></button></div>
+    </form>
+  </div>
+
+  <!-- 2FA Setup Modal -->
+  <div id="setup2faModal" class="modal hidden">
+    <div class="modal-card" style="max-width:480px">
+      <h3 id="setupModalTitle">2FA einrichten</h3>
+      <div class="modal-body">
+        <div class="muted" style="margin-bottom:12px">Scanne den QR-Code mit deiner 2FA-App und gib den Code zur Bestätigung ein.</div>
+        <div class="flex-center-column" style="width:100%;gap:8px">
+          <img id="qrImg" alt="QR Code" style="max-width:220px;border:1px solid rgba(15,23,42,0.08);border-radius:10px;">
+          <div id="otpSecret" class="muted small" style="word-break:break-all"></div>
+          <div id="otpUri" class="muted small" style="word-break:break-all"></div>
+        </div>
+        <div class="field" style="margin-top:12px"><label>OTP bestätigen</label><input type="text" id="setupOtp" inputmode="numeric" autocomplete="one-time-code"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="confirm2faBtn">2FA bestätigen <span id="confirmSpinner" class="inline-spinner hidden" aria-hidden="true"></span></button>
+      </div>
+    </div>
+  </div>
+<script>
+  // Cookie-based session now; no localStorage token needed
+
+  let setupToken = null;
+
+  async function handleLogin(e){
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const spinner = document.getElementById('loginSpinner');
+    btn.disabled = true; spinner.classList.remove('hidden');
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const otpVal = document.getElementById('otp').value;
+    const err = document.getElementById('error'); err.classList.add('hidden');
+    try{
+      const payload = new URLSearchParams({username,password});
+      if(otpVal) payload.append('otp', otpVal);
+      const res = await fetch('/auth/login', {method:'POST', body: payload});
+      const data = await res.json().catch(()=>({error:'Login fehlgeschlagen'}));
+      if(res.ok && data.access_token){
+        window.location.href = '/';
+        return;
+      }
+      if(data.status === '2fa_setup_required'){
+        setupToken = data.setup_token;
+        document.getElementById('qrImg').src = data.qr;
+        document.getElementById('otpSecret').textContent = 'Secret: ' + data.secret;
+        document.getElementById('otpUri').textContent = 'URL: ' + data.otpauth_url;
+        document.getElementById('setup2faModal').classList.remove('hidden');
+        err.classList.add('hidden');
+        btn.disabled = false; spinner.classList.add('hidden');
+        return;
+      }
+      if(data.otp_required){
+        document.getElementById('otpRow').classList.remove('hidden');
+        err.textContent = data.error || 'Bitte OTP eingeben';
+        err.classList.remove('hidden');
+        btn.disabled = false; spinner.classList.add('hidden');
+        return;
+      }
+      err.textContent = data.error || data.message || 'Login fehlgeschlagen';
+      err.classList.remove('hidden');
+    }catch(errMsg){
+      const errEl = document.getElementById('error'); errEl.textContent = 'Netzwerkfehler'; errEl.classList.remove('hidden');
+    }
+    btn.disabled = false; spinner.classList.add('hidden');
+  }
+
+  async function confirm2FA(){
+    const btn = document.getElementById('confirm2faBtn');
+    const spinner = document.getElementById('confirmSpinner');
+    const err = document.getElementById('error'); err.classList.add('hidden');
+    btn.disabled = true; spinner.classList.remove('hidden');
+    try{
+      const otp = document.getElementById('setupOtp').value;
+      const res = await fetch('/auth/confirm-2fa', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', 'Authorization': 'Bearer ' + setupToken},
+        body: JSON.stringify({otp})
+      });
+      const data = await res.json().catch(()=>({error:'Bestätigung fehlgeschlagen'}));
+      if(res.ok && data.access_token){
+        window.location.href = '/';
+        return;
+      }
+      err.textContent = data.error || 'Bestätigung fehlgeschlagen';
+      err.classList.remove('hidden');
+    }catch(e){
+      err.textContent = 'Netzwerkfehler'; err.classList.remove('hidden');
+    }
+    btn.disabled = false; spinner.classList.add('hidden');
+  }
+
+  document.getElementById('loginForm').onsubmit = handleLogin;
+  document.getElementById('confirm2faBtn').onclick = confirm2FA;
+</script>
+</body>
+</html>

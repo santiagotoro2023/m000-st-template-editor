@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #fff; color: #111; font-family: Arial, Helvetica, sans-serif; }
+    .hidden { display: none !important; }
+    .muted { color: #6b7280; padding: 12px; text-align: center; }
+    #pdfFrame { position: fixed; inset: 0; width: 100vw; height: 100vh; border: 0; background: #fff; }
+    @media print {
+      @page { size: auto; margin: 0; }
+      html, body { margin: 0; }
+      .muted { display: none !important; }
+    }
+  </style>
+  <script>
+    (function(){
+      function openAndMaybePrint(){
+        const params = new URLSearchParams(location.search);
+        const file = params.get('file');
+        const shouldPrint = params.get('print') === '1';
+        const msg = document.getElementById('msg');
+        if(!file){ msg.textContent = 'Keine Datei angegeben'; msg.classList.remove('hidden'); return; }
+        const src = file + (file.includes('#') ? '' : '#toolbar=0&navpanes=0&scrollbar=0');
+        const iframe = document.createElement('iframe');
+        iframe.id = 'pdfFrame';
+        iframe.src = src;
+        iframe.onload = function(){
+          if(shouldPrint){
+            // Try to trigger print of the embedded PDF
+            try{
+              // Focus the frame and try printing the frame directly first
+              iframe.contentWindow && iframe.contentWindow.focus && iframe.contentWindow.focus();
+              if(iframe.contentWindow && typeof iframe.contentWindow.print === 'function'){
+                setTimeout(()=>{ try{ iframe.contentWindow.print(); }catch(e){ try{ window.print(); }catch(_e){} } }, 200);
+              }else{
+                setTimeout(()=>{ try{ window.print(); }catch(_e){} }, 200);
+              }
+              // Close the window after printing if this tab was opened for printing
+              window.addEventListener('afterprint', ()=>{ try{ window.close(); }catch(_e){} });
+            }catch(e){ /* ignore */ }
+          }
+        };
+        document.body.appendChild(iframe);
+      }
+      window.addEventListener('DOMContentLoaded', openAndMaybePrint);
+    })();
+  </script>
+  </head>
+<body>
+  <div id="msg" class="muted hidden"></div>
+</body>
+</html>

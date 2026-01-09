@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Vorlagen Editor</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="/static/template-editor-logo.png" type="image/png">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/static/template-editor-logo.png" alt="Vorlagen Editor" class="logo logo-img">
+        <div class="brand-text">
+          <h2>Vorlagen Editor</h2>
+          <small class="muted">Vorlage zu PDF</small>
+        </div>
+      </div>
+      <nav>
+        <a href="#" id="navPdf" class="nav-link active" onclick="switchView('pdf')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5L13.5 3Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13.5 3v5.5H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>PDF generieren</span>
+        </a>
+        <a href="#" id="navDocuments" class="nav-link" onclick="switchView('documents')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="3.5" y="7" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>Dokumente</span>
+        </a>
+        <a href="#" id="navTemplates" class="nav-link" onclick="switchView('templates')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3.5" y="3.5" width="7" height="7" rx="1.4" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="13.5" y="3.5" width="7" height="7" rx="1.4" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="3.5" y="13.5" width="7" height="7" rx="1.4" stroke="currentColor" stroke-width="1.6"/>
+              <rect x="13.5" y="13.5" width="7" height="7" rx="1.4" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <span>Vorlagen verwalten</span>
+        </a>
+        <a href="#" id="navCustomers" class="nav-link hidden" onclick="switchView('customers')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.5 10a3 3 0 1 1-5.998-.002A3 3 0 0 1 14.5 10Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4.75 18.75a5.25 5.25 0 0 1 10.5 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M16.6 6.8a2.4 2.4 0 1 1-1.2 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18.85 18.25c-.15-1.65-1.05-3.05-2.35-3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>Kunden</span>
+        </a>
+        <a href="#" id="navAdmin" class="nav-link hidden" onclick="switchView('admin')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3.2 18.5 6v6.2c0 4-2.9 7.5-6.5 8.8-3.6-1.3-6.5-4.8-6.5-8.8V6L12 3.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M9.5 12.75 11.25 14.5 14.8 10.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>Administration</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="userArea" class="user-area flex-center-column">
+          <div id="userDisplay" class="user-display hidden text-center"></div>
+          <div id="userActions" class="user-actions hidden flex-row-gap">
+            <button class="secondary" onclick="logout()">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Abmelden
+            </button>
+          </div>
+          <a href="/static/login.html" id="loginLink" class="muted hidden">Anmelden</a>
+          <small class="muted">v1.0 <br>Made with ☕ by Santiago</small>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h1>Vorlagen Editor</h1>
+
+      </header>
+
+      <section id="pdfView" class="view">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">PDF</p>
+            <h2>PDF generieren</h2>
+            <p class="section-subtitle">Vorlage wählen, Felder ausfüllen und rechts direkt die Vorschau prüfen.</p>
+          </div>
+        </div>
+        <div class="grid two-col responsive-gap">
+          <div class="stack" style="gap:14px">
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Vorlage wählen</h3>
+                  <p class="muted small">Steuert Felder und PDF-Name.</p>
+                </div>
+              </div>
+              <select id="templateSelectPDF" onchange="loadPDFFields()"></select>
+            </div>
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Felder ausfüllen</h3>
+                  <p class="muted small">Alle Pflichtfelder ausfüllen, dann generieren.</p>
+                </div>
+              </div>
+              <form id="dynamicPDFForm"></form>
+            </div>
+          </div>
+          <div class="card sticky-card">
+            <div class="card-heading">
+              <div>
+                <h3>Vorschau & Ausgabe</h3>
+                <p class="muted small">Fortschritt und fertiges PDF.</p>
+              </div>
+            </div>
+            <div id="pdfProgress" class="progress hidden" aria-hidden="true" style="margin-bottom:10px">
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <div class="progress-label muted small" id="pdfProgressLabel">0%</div>
+            </div>
+            <div id="pdfPreview" class="hidden">
+              <div class="flex-row-gap" style="margin-bottom:8px">
+                <div>
+                  <div class="muted small">Dateiname</div>
+                  <div id="pdfPreviewName" class="preview-name"></div>
+                </div>
+                <div style="margin-left:auto" class="flex-row-gap">
+                  <button class="secondary" id="printPdfBtn" onclick="printGeneratedPdf()">Drucken</button>
+                  <button class="btn-primary" id="savePdfBtn" onclick="saveGeneratedPdf()">Speichern</button>
+                  <button class="btn-delete" id="deletePdfBtn" onclick="deleteGeneratedPdf()">Löschen</button>
+                </div>
+              </div>
+              <iframe id="pdfPreviewFrame" class="preview-frame"></iframe>
+            </div>
+            <div id="pdfPreviewEmpty" class="muted small hidden">Wähle eine Vorlage und fülle die Felder aus, um eine Vorschau zu sehen.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="templatesView" class="view hidden">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Vorlagen</p>
+            <h2>Vorlagen verwalten</h2>
+            <p class="section-subtitle">Upload, Übersicht und Felddefinitionen auf einen Blick.</p>
+          </div>
+        </div>
+        <div class="grid two-col responsive-gap">
+          <div class="stack" style="gap:14px">
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Upload</h3>
+                  <p class="muted small">DOCX hochladen und optional Standardfelder anhängen.</p>
+                </div>
+              </div>
+              <input type="file" id="uploadFile" accept=".docx" class="hidden">
+              <div class="upload-row">
+                <label for="uploadFile" class="file-chooser" id="uploadFileLabel">Datei auswählen (.docx)</label>
+                <span id="uploadFileName" class="muted small">Keine Datei ausgewählt</span>
+                <button class="btn-primary" onclick="uploadTemplate()">Hochladen</button>
+              </div>
+              <div class="mt-8">
+                <label class="checkbox-label"><input type="checkbox" id="uploadAddStdFields" checked> Standardfelder hinzufügen</label>
+              </div>
+              <div id="uploadProgress" class="progress hidden" aria-hidden="true" style="margin-top:10px">
+                <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+                <div class="progress-label muted small" id="uploadProgressLabel">0%</div>
+              </div>
+            </div> 
+
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Vorhandene Vorlagen</h3>
+                  <p class="muted small">Verwalten, herunterladen oder löschen.</p>
+                </div>
+              </div>
+              <ul id="templateList"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-heading">
+              <div>
+                <h3>Felder bearbeiten</h3>
+                <p class="muted small">Feldstruktur pro Vorlage anpassen.</p>
+              </div>
+            </div>
+            <select id="templateSelectFields" onchange="loadTemplateFields()"></select>
+            <div id="fieldsEditor"></div>
+            <div class="mt-8">
+              <button class="btn-primary" onclick="addNewField()">Neues Feld hinzufügen</button>
+            </div> 
+          </div>
+        </div>
+      </section>
+
+      <section id="customersView" class="view hidden">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Kunden</p>
+            <h2>Kunden verwalten</h2>
+            <p class="section-subtitle">Neue Kunden anlegen und bestehende Datensätze pflegen.</p>
+          </div>
+        </div>
+        <div class="grid responsive-gap">
+          <div class="card" style="grid-column: 1 / -1">
+            <div class="card-heading">
+              <div>
+                <h3>Neuer Kunde</h3>
+                <p class="muted small">Felder ausfüllen und speichern.</p>
+              </div>
+            </div>
+            <div id="customerStdFields"></div>
+            <div class="mt-8"><button class="btn-primary" onclick="customerCreate()">Anlegen</button></div>
+          </div>
+          <div class="card">
+            <div class="card-heading">
+              <div>
+                <h3>Bestehende Kunden</h3>
+                <p class="muted small">Bearbeiten oder löschen direkt in der Tabelle.</p>
+              </div>
+            </div>
+              <div class="flex-row-gap" style="margin-bottom:8px">
+                <input id="customerSearch" class="field-input" placeholder="Kunden suchen..." oninput="customersLoadDebounced()" style="flex:1">
+              </div>
+            <table id="customersTable" style="width:100%"></table>
+          </div>
+        </div>
+      </section>
+
+      <section id="adminView" class="view hidden">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Admin</p>
+            <h2>Administration</h2>
+            <p class="section-subtitle">Benutzer, Sicherheit und Einstellungen steuern.</p>
+          </div>
+        </div>
+        <div class="grid two-col responsive-gap">
+          <div class="card">
+            <div class="card-heading">
+              <div>
+                <h3>Benutzer verwalten</h3>
+                <p class="muted small">Rollen, Passwörter und 2FA.</p>
+              </div>
+            </div>
+            <table id="adminUsersTable"></table>
+            <div class="mt-12 flex-row-gap admin-create-row">
+              <input id="newUserUsername" placeholder="Benutzername" class="field-input flex-1">
+              <input id="newUserPassword" type="password" placeholder="Passwort" class="field-input flex-1" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" name="new-password">
+              <label class="checkbox-label"><input type="checkbox" id="newUserIsAdmin"> Administrator</label>
+              <button class="btn-primary" onclick="adminCreateUser()">Erstellen</button>
+            </div>
+          </div>
+
+          <div class="stack" style="gap:14px">
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Sitzungsdauer</h3>
+                  <p class="muted small">Lebensdauer von Access-Tokens.</p>
+                </div>
+              </div>
+              <div class="field inline">
+                <label>Sitzungsdauer (Tage)</label>
+                <input type="number" id="sessionLifetime" min="1" class="small-input field-input">
+              </div>
+              <div class="mt-8"><button class="btn-primary" onclick="adminSaveSettings()">Speichern</button></div>
+            </div>
+
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Dateiname Vorlage</h3>
+                  <p class="muted small">Platzhalter: {template}, {customer}, {date}</p>
+                </div>
+              </div>
+              <div class="field inline">
+                <label>Pattern</label>
+                <input type="text" id="filenamePattern" class="field-input" placeholder="{template}-{customer}-{date}">
+              </div>
+              <div class="mt-8"><button class="btn-primary" onclick="adminSaveFilenamePattern()">Speichern</button></div>
+            </div>
+
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Standardfelder</h3>
+                  <p class="muted small">Werden neuen Vorlagen und Kunden hinzugefügt.</p>
+                </div>
+              </div>
+              <table id="adminStdFieldsTable" style="width:100%"></table>
+              <div class="mt-12 flex-row-gap admin-create-row">
+                <input id="newSFKey" placeholder="Schlüssel (z.B. KUNDENNUMMER)" class="field-input" style="max-width:260px">
+                <select id="newSFType" class="field-input" style="max-width:160px">
+                  <option value="text">Text</option>
+                  <option value="date">Datum</option>
+                  <option value="checkbox">Checkbox</option>
+                </select>
+                <button class="btn-primary" onclick="adminAddStandardField()">Hinzufügen</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-heading">
+                <div>
+                  <h3>Temp Ordner</h3>
+                  <p class="muted small">Aufräumen und Aufbewahrungsdauer setzen.</p>
+                </div>
+              </div>
+              <button class="btn-primary" onclick="adminClearTemp()">Temp Ordner Inhalt löschen</button>
+              <span id="adminClearTempResult" class="muted ml-8"></span>
+              <div class="field inline mt-12">
+                <label>Temp-Aufbewahrung (Stunden)</label>
+                <input type="number" id="tempRetentionHours" min="1" class="small-input field-input">
+                <button class="btn-primary" onclick="adminSaveTempRetention()">Speichern</button>
+              </div>
+            </div>
+          </div>
+        </div> 
+      </section>
+
+      <section id="documentsView" class="view hidden">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Dokumente</p>
+            <h2>Generierte Dokumente</h2>
+            <p class="section-subtitle">Alle PDFs mit Suche und Details.</p>
+          </div>
+        </div>
+        <div class="grid two-col responsive-gap">
+          <div class="card">
+            <div class="card-heading">
+              <div>
+                <h3>Filter</h3>
+                <p class="muted small">Nach Kunde, Vorlage, Benutzer filtern.</p>
+              </div>
+            </div>
+            <div class="flex-row-gap" style="margin-bottom:8px">
+              <input id="docSearch" class="field-input" placeholder="Suche (Name/Vorlage)" oninput="documentsLoadDebounced()" style="flex:1">
+              <select id="docFilterCustomer" class="field-input" onchange="documentsLoad()" style="max-width:220px"></select>
+              <select id="docFilterTemplate" class="field-input" onchange="documentsLoad()" style="max-width:220px"></select>
+              <select id="docFilterUser" class="field-input" onchange="documentsLoad()" style="max-width:180px"></select>
+            </div>
+            <table id="documentsTable" style="width:100%"></table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+// --- navigation / views ---
+function switchView(view){
+    document.querySelectorAll('.view').forEach(s=>s.classList.add('hidden'));
+    const id = view + 'View';
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+  const navId = view === 'pdf' ? 'navPdf' : view === 'templates' ? 'navTemplates' : view === 'admin' ? 'navAdmin' : view==='customers' ? 'navCustomers' : view==='documents' ? 'navDocuments' : null;
+    const navEl = navId ? document.getElementById(navId) : null;
+    if(navEl) navEl.classList.add('active');
+
+    // ensure templates are loaded when needed
+    if(view === 'templates'){
+        loadTemplates().then(()=>{
+            const sel = document.getElementById('templateSelectFields');
+            if(sel && sel.value) loadTemplateFields();
+        });
+    }
+    if(view === 'pdf'){
+        loadTemplates().then(()=>{
+            loadPDFFields();
+        });
+    }
+    if(view === 'customers'){
+      customersInit();
+    }
+    if(view === 'admin'){
+        adminLoadUsers();
+        adminGetSettings();
+      adminLoadStandardFields();
+    }
+    if(view === 'documents'){
+      documentsInit();
+    }
+}
+
+// -------------------- existing functions --------------------
+async function authFetch(url, options={}){
+  const res = await fetch(url, Object.assign({}, options, {credentials:'same-origin'}));
+  if(res.status !== 401) return res;
+  // Soft-check session status before redirecting to avoid false positives
+  try{
+    const ping = await fetch('/me', {credentials:'same-origin'});
+    if(ping.status === 401){
+      window.location.href = '/static/login.html';
+      throw new Error('unauthorized');
+    }
+    // Session seems valid: retry the original request once
+    const retry = await fetch(url, Object.assign({}, options, {credentials:'same-origin'}));
+    return retry;
+  }catch(_e){/* ignore and fall through */}
+  // If /me is fine, bubble up the 401 to caller for handling
+  return res;
+}
+
+function ensureAuthenticated(){ return true; }
+
+let currentGeneratedId = null;
+let currentGeneratedName = null;
+async function loadTemplates() {
+    const res = await fetchWithOverlay("/templates", {}, 'Vorlagen werden geladen...');
+    const data = await res.json();
+    const list = document.getElementById("templateList");
+    const selectFields = document.getElementById("templateSelectFields");
+    const selectPDF = document.getElementById("templateSelectPDF");
+    const customerSelect = document.getElementById("customerSelectPDF");
+    list.innerHTML = "";
+    selectFields.innerHTML = "";
+    selectPDF.innerHTML = "";
+    data.forEach(t=>{
+        list.innerHTML += `<li>${t.name} <button class="btn-delete" onclick="deleteTemplate('${t.name}')">Löschen</button></li>`;
+        if(selectFields) selectFields.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+        if(selectPDF) selectPDF.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+    });
+
+    // set defaults to first option when available
+    if(selectFields && selectFields.options.length>0 && !selectFields.value){
+        selectFields.value = selectFields.options[0].value;
+    }
+    if(selectPDF && selectPDF.options.length>0 && !selectPDF.value){
+        selectPDF.value = selectPDF.options[0].value;
+    }
+
+    // if there are no templates, show a placeholder option so other code doesn't attempt to fetch empty values
+    if(selectFields && selectFields.options.length===0){ selectFields.innerHTML = '<option value="">Keine Vorlagen vorhanden</option>'; }
+    if(selectPDF && selectPDF.options.length===0){ selectPDF.innerHTML = '<option value="">Keine Vorlagen vorhanden</option>'; }
+
+    // refresh fields for active view
+    const templatesVisible = !document.getElementById('templatesView').classList.contains('hidden');
+    const pdfVisible = !document.getElementById('pdfView').classList.contains('hidden');
+    if(templatesVisible) loadTemplateFields();
+    if(pdfVisible) loadPDFFields();
+}
+
+async function uploadTemplate() {
+    const fileInput = document.getElementById("uploadFile");
+    const file = fileInput.files[0];
+    if(!file) return showModal('Bitte wähle zuerst eine Datei aus.', 'error');
+    // Validate extension
+    const allowed = ['.docx'];
+    const ext = file.name.slice((Math.max(0, file.name.lastIndexOf('.')) || Infinity)).toLowerCase();
+    if(!allowed.includes(ext)) return showModal('Nur .docx Dateien sind erlaubt. Bitte wähle eine gültige Datei.', 'error');
+
+    const progress = document.getElementById('uploadProgress');
+    const fill = progress.querySelector('.progress-fill');
+    const label = document.getElementById('uploadProgressLabel');
+    progress.classList.remove('hidden');
+    fill.style.width = '0%'; label.textContent = '0%';
+
+    const xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+    const fd = new FormData(); fd.append('file', file);
+    const addStd = document.getElementById('uploadAddStdFields');
+    fd.append('add_standard_fields', addStd && addStd.checked ? 'true' : 'false');
+    xhr.open('POST', '/templates/upload', true);
+    xhr.upload.onprogress = function(e){
+        if(e.lengthComputable){
+            const pct = Math.round((e.loaded / e.total) * 100);
+            fill.style.width = pct + '%';
+            label.textContent = pct + '%';
+        }
+    };
+    xhr.onload = function(){
+        progress.classList.add('hidden');
+        if(xhr.status >=200 && xhr.status < 300){
+            showModal('Datei erfolgreich hochgeladen.', 'success');
+            loadTemplates();
+        }else if(xhr.status === 401){
+            window.location.href = '/static/login.html';
+        }else{
+            let msg = 'Upload fehlgeschlagen';
+            try{ msg = JSON.parse(xhr.responseText).error || msg }catch(e){}
+            showModal(msg, 'error');
+        }
+    };
+    xhr.onerror = function(){ progress.classList.add('hidden'); showModal('Upload fehlgeschlagen (Netzwerkfehler).', 'error'); };
+    xhr.send(fd);
+}
+
+async function deleteTemplate(name) {
+    showConfirm(`Vorlage "${name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`, async ()=>{
+    const res = await authFetch('/templates/' + encodeURIComponent(name), {method:"DELETE"});
+        if(!res.ok){
+            const err = await res.json().catch(()=>({message:'Löschen fehlgeschlagen'}));
+            showModal(err.message || 'Löschen fehlgeschlagen', 'error');
+            return;
+        }
+        showModal('Vorlage gelöscht.', 'success');
+        loadTemplates();
+    });
+}
+
+// -------------------- Feldeditor --------------------
+async function loadTemplateFields() {
+    const sel = document.getElementById("templateSelectFields");
+    if(!sel || !sel.value){ const editor = document.getElementById("fieldsEditor"); editor.innerHTML = '<div class="muted">Keine Vorlagen vorhanden</div>'; return; }
+    const templateName = sel.value;
+    try{
+      const res = await fetchWithOverlay('/templates/' + encodeURIComponent(templateName), {}, 'Vorlage wird geladen...');
+      const data = await res.json();
+      const editor = document.getElementById("fieldsEditor");
+      editor.innerHTML = "";
+      // header row
+      editor.innerHTML += `<div class="fields-header"><div><strong>Name</strong></div><div><strong>Typ</strong></div></div>`;
+
+      data.fields.forEach((f,i)=>{
+          editor.innerHTML += `
+              <div id="field_${i}" class="field-card">
+                  <div class="field-grid">
+                    <div>
+                      <label>Name</label>
+                      <input class="field-input" type="text" value="${f.name}" id="fieldName_${i}">
+                    </div>
+                    <div>
+                      <label>Typ</label>
+                      <select class="field-input" id="fieldType_${i}">
+                          <option value="text" ${f.type==="text"?"selected":""}>Text</option>
+                          <option value="number" ${f.type==="number"?"selected":""}>Zahl</option>
+                          <option value="textarea" ${f.type==="textarea"?"selected":""}>Mehrzeilig</option>
+                          <option value="select" ${f.type==="select"?"selected":""}>Auswahl</option>
+                          <option value="date" ${f.type==="date"?"selected":""}>Datum</option>
+                          <option value="checkbox" ${f.type==="checkbox"?"selected":""}>Checkbox</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="field-grid">
+                    ${f.type==='select' ? `<div><label>Optionen (Kommagetrennt)</label><input class="field-input" type="text" value="${(f.options||[]).join(', ')}" id="fieldOptions_${i}"></div>` : ''}
+                  </div>
+                  <div class="field-actions"><button class="btn-primary" onclick="updateField(${i})">Speichern</button><button class="btn-delete" onclick="deleteField(${i})">Löschen</button></div>
+              </div>
+          `;
+      });
+    }catch(e){
+      // fetchWithOverlay handles redirects; show error otherwise
+      showModal('Fehler beim Laden der Felder', 'error');
+    }
+}
+
+// Neues Feld hinzufügen
+function addNewField() {
+    const select = document.getElementById("templateSelectFields");
+    if(!select || select.options.length === 0){
+        return showModal('Es sind keine Vorlagen vorhanden. Bitte lade zuerst eine .docx Vorlage hoch.', 'error');
+    }
+    const templateName = select.value;
+    const field = {name:"NEUES_FELD", type:"text"};
+    fetchWithOverlay('/templates/' + encodeURIComponent(templateName) + '/fields/add', {method:"POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(field)}, 'Feld wird hinzugefügt...')
+      .then(()=>{ loadTemplateFields(); loadPDFFields(); }).catch(()=>{});
+} 
+
+// Feld aktualisieren
+function updateField(i) {
+    const templateName = document.getElementById("templateSelectFields").value;
+    const name = document.getElementById(`fieldName_${i}`).value;
+    const type = document.getElementById(`fieldType_${i}`).value;
+  const optsEl = document.getElementById(`fieldOptions_${i}`);
+  const options = optsEl ? optsEl.value.split(',').map(s=>s.trim()).filter(Boolean) : undefined;
+  const payload = options ? {name,type,options} : {name,type};
+  fetchWithOverlay('/templates/' + encodeURIComponent(templateName) + '/fields/update/' + i, {method:"POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(payload)}, 'Feld wird gespeichert...')
+      .then(()=>{ loadTemplateFields(); loadPDFFields(); }).catch(()=>{});
+}
+
+// Feld löschen
+function deleteField(i) {
+    const templateName = document.getElementById("templateSelectFields").value;
+    showConfirm(`Feld #${i} wirklich löschen?`, async ()=>{
+        const res = await fetchWithOverlay('/templates/' + encodeURIComponent(templateName) + '/fields/' + i, {method:"DELETE"}, 'Feld wird gelöscht...');
+        if(!res.ok){ const err = await res.json().catch(()=>({message:'Löschen fehlgeschlagen'})); showModal(err.message || 'Löschen fehlgeschlagen', 'error'); return; }
+        showModal('Feld gelöscht.', 'success'); loadTemplateFields(); loadPDFFields();
+    });
+}
+
+// -------------------- PDF Form --------------------
+async function loadPDFFields() {
+    const select = document.getElementById("templateSelectPDF");
+    const templateName = select ? select.value : '';
+    const form = document.getElementById("dynamicPDFForm");
+    const pdfProgress = document.getElementById('pdfProgress');
+    const pdfFill = pdfProgress.querySelector('.progress-fill');
+    const pdfLabel = document.getElementById('pdfProgressLabel');
+    const preview = document.getElementById('pdfPreview');
+    
+    if(!templateName){
+        form.innerHTML = '<div class="muted">Keine Vorlagen vorhanden. Bitte lade zuerst eine Vorlage hoch.</div>';
+        preview.classList.add('hidden');
+        return;
+    }
+    
+      try {
+        const res = await authFetch('/templates/' + encodeURIComponent(templateName));
+        if(!res.ok){
+          let msg = 'Fehler beim Laden der Vorlage';
+          try{ const j = await res.json(); msg = j.error || msg; }catch(_e){}
+          throw new Error(msg);
+        }
+        const data = await res.json();
+        
+        // Baue das komplette HTML auf einmal zusammen
+        let html = `<label>Kunde wählen (optional): <select id="customerSelectPDF" onchange="onSelectCustomerForPDF()"><option value="">Kein Kunde</option></select></label><br>`;
+        html += `<label>Dateiname: <input type="text" id="pdfFileName" name="pdfFileName" value="${templateName.replace(".docx","")}"></label><br>`;
+        
+        // Dynamische Felder
+        data.fields.forEach(f=>{
+          let input="";
+          if(f.type==="text") input=`<input type="text" name="${f.name}">`;
+          if(f.type==="number") input=`<input type="number" name="${f.name}">`;
+          if(f.type==="textarea") input=`<textarea name="${f.name}"></textarea>`;
+          if(f.type==="select") {
+            const opts = (f.options||[]).map(o=>`<option value="${o}">${o}</option>`).join('');
+            input=`<select name="${f.name}">${opts}</select>`;
+          }
+          if(f.type==="date") input=`<input type="date" name="${f.name}">`;
+          if(f.type==="checkbox") input=`<input type="checkbox" name="${f.name}">`;
+          html += `<label>${f.name}: ${input}</label><br>`;
+        });
+        
+        html += `<button type="submit" class="btn-primary" id="generatePdfBtn">PDF generieren</button>`;
+        
+        // Setze alles auf einmal
+        form.innerHTML = html;
+        
+        // Lade Kunden für Dropdown (nach DOM-Erstellung)
+        await loadCustomersIntoSelect();
+        // Autosave: restored draft values
+        restorePdfDraft(templateName);
+        // Attach autosave listeners
+        attachPdfAutosave(templateName);
+      } catch(e) {
+        console.error('Fehler beim Laden der PDF-Felder:', e);
+        const safeMsg = (e && e.message) ? e.message : 'Fehler beim Laden der Vorlage.';
+        form.innerHTML = `<div class="muted">${safeMsg}</div>`;
+        preview.classList.add('hidden');
+        return;
+      }
+
+    form.onsubmit = async e=>{
+        e.preventDefault();
+        const btn = document.getElementById('generatePdfBtn');
+        btn.disabled = true;
+        preview.classList.add('hidden');
+
+        pdfProgress.classList.remove('hidden');
+        pdfFill.style.width = '0%'; pdfLabel.textContent = '0%';
+
+        const fd = new FormData(form);
+        // Füge customerId hinzu wenn Kunde ausgewählt
+        const custSel = document.getElementById('customerSelectPDF');
+        if(custSel && custSel.value){ fd.append('customerId', custSel.value); }
+        const obj = {};
+        fd.forEach((v,k)=>obj[k] = (v==="on")?true:v);
+        try{
+            const res = await authFetch(`/generate/${templateName}`, {method:"POST", body: new URLSearchParams(obj)});
+            if(!res.ok){
+                const isJson = res.headers.get('content-type') && res.headers.get('content-type').includes('application/json');
+                if(isJson){
+                    const j = await res.json().catch(()=>null);
+                    throw new Error(j?.error || j?.message || 'Fehler beim Generieren des PDFs');
+                }
+                throw new Error('Fehler beim Generieren des PDFs');
+            }
+            const j = await res.json();
+            currentGeneratedId = j.id;
+            currentGeneratedName = j.file_name || '';
+            document.getElementById('pdfPreviewName').textContent = currentGeneratedName;
+            // clear draft after successful submit
+            clearPdfDraft(templateName);
+
+            // poll status
+            const pollInterval = 500;
+            let visualPct = 0;
+            let lastServerPct = 0;
+            let lastBump = Date.now();
+            const poll = setInterval(async ()=>{
+                try{
+                    const st = await authFetch('/generate/' + encodeURIComponent(j.id) + '/status');
+                    if(!st.ok){ clearInterval(poll); showModal('Fehler beim Überprüfen des Fortschritts', 'error'); pdfProgress.classList.add('hidden'); btn.disabled = false; return; }
+                    const sj = await st.json();
+                const serverPct = sj.percent || 0;
+                // snap forward to any higher server percent
+                if(serverPct > visualPct) { visualPct = serverPct; lastServerPct = serverPct; lastBump = Date.now(); }
+                // while processing and server percent hasn't moved, gently increase up to a ceiling
+                if(sj.status === 'processing'){
+                  const now = Date.now();
+                  const ceiling = Math.min(serverPct + 25, 95);
+                  if(now - lastBump > 700 && visualPct < ceiling){ visualPct = Math.min(ceiling, visualPct + 1); lastBump = now; }
+                }
+                pdfFill.style.width = visualPct + '%'; pdfLabel.textContent = Math.round(visualPct) + '%';
+                    if(sj.status === 'done'){
+                        clearInterval(poll);
+                        pdfFill.style.width = '100%'; pdfLabel.textContent = '100%';
+                        setTimeout(()=>{ pdfProgress.classList.add('hidden'); }, 600);
+                        // finalize to archive and show archived file in preview
+                        try{
+                          const fres = await authFetch('/documents/finalize', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({task_id: j.id})});
+                          const fj = await fres.json().catch(()=>({}));
+                          if(fres.ok && fj.id){ window.currentGeneratedDocId = fj.id; document.getElementById('pdfPreviewFrame').src = '/static/pdfviewer.html?file=' + encodeURIComponent('/documents/'+fj.id+'/file'); }
+                          else { document.getElementById('pdfPreviewFrame').src = '/static/pdfviewer.html?file=/generated/' + encodeURIComponent(j.id); }
+                        }catch(_e){ document.getElementById('pdfPreviewFrame').src = '/static/pdfviewer.html?file=/generated/' + encodeURIComponent(j.id); }
+                        preview.classList.remove('hidden');
+                        btn.disabled = false;
+                    } else if(sj.status === 'error'){
+                        clearInterval(poll);
+                        pdfProgress.classList.add('hidden');
+                        showModal(sj.error || 'Fehler beim Generieren des PDFs', 'error');
+                        btn.disabled = false;
+                    }
+                }catch(e){ clearInterval(poll); pdfProgress.classList.add('hidden'); showModal('Netzwerkfehler beim Abfragen des Fortschritts', 'error'); btn.disabled = false; }
+            }, pollInterval);
+
+        }catch(err){
+            pdfProgress.classList.add('hidden');
+            showModal(err.message || 'Fehler beim Generieren des PDFs', 'error');
+            btn.disabled = false;
+        }
+    };
+}
+
+// Customers page logic
+async function customersInit(){
+  // load standard fields and render create form inputs
+  const res = await authFetch('/standard-fields');
+  if(!res.ok) return;
+  const fields = await res.json();
+  const cont = document.getElementById('customerStdFields');
+  cont.innerHTML = '';
+  fields.forEach(f=>{
+    const label = f.key.charAt(0) + f.key.slice(1).toLowerCase().replace(/_/g, ' ');
+    const row = document.createElement('div'); row.className = 'field-row';
+    let input = '';
+    if(f.type === 'text') input = `<input class="field-input" id="customerField_${f.key}" placeholder="${label}">`;
+    else if(f.type === 'date') input = `<input type="date" class="field-input" id="customerField_${f.key}">`;
+    else if(f.type === 'checkbox') input = `<label class="checkbox-label"><input type="checkbox" id="customerField_${f.key}"> ${label}</label>`;
+    row.innerHTML = `<label style="min-width:140px">${label}</label>${input}`;
+    cont.appendChild(row);
+  });
+  customersLoad();
+}
+
+async function customersLoad(){
+  const qEl = document.getElementById('customerSearch');
+  const q = qEl ? qEl.value.trim() : '';
+  const url = q ? ('/customers?q=' + encodeURIComponent(q)) : '/customers';
+  const res = await authFetch(url);
+  if(!res.ok) return;
+  const list = await res.json();
+  const table = document.getElementById('customersTable');
+  table.innerHTML = '<tr><th class="text-left">Kunde</th><th>Aktionen</th></tr>';
+  list.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td class="text-right"><button class="btn-primary" onclick="customerEdit(${c.id})">Bearbeiten</button> <button class="btn-delete" onclick="customerDelete(${c.id})">Löschen</button></td>`;
+    table.appendChild(tr);
+  });
+}
+
+let customersLoadTimer;
+function customersLoadDebounced(){
+  clearTimeout(customersLoadTimer);
+  customersLoadTimer = setTimeout(()=>customersLoad(), 200);
+}
+
+async function customerCreate(){
+  const resSF = await authFetch('/standard-fields');
+  const sfs = await resSF.json();
+  const fields = {};
+  sfs.forEach(f=>{
+    const el = document.getElementById('customerField_'+f.key);
+    if(f.type === 'checkbox') fields[f.key] = el && el.checked;
+    else fields[f.key] = el ? el.value : '';
+  });
+  const name = fields['FIRMENNAME'] || 'Kunde ' + new Date().getTime();
+  const res = await fetchWithOverlay('/customers', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, fields})}, 'Kunde wird erstellt...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  showModal('Kunde angelegt', 'success');
+  sfs.forEach(f=>{
+    const el = document.getElementById('customerField_'+f.key);
+    if(el) {
+      if(f.type === 'checkbox') el.checked = false;
+      else el.value = '';
+    }
+  });
+  customersLoad();
+}
+
+async function customerDelete(id){
+  showConfirm('Kunden wirklich löschen?', async ()=>{
+    const res = await fetchWithOverlay('/customers/'+id, {method:'DELETE'}, 'Kunde wird gelöscht...');
+    if(!res.ok){ const j = await res.json().catch(()=>({error:'Fehler'})); return showModal(j.error || 'Fehler', 'error'); }
+    showModal('Kunde gelöscht', 'success'); customersLoad();
+  });
+}
+
+async function customerEdit(id){
+  // basic inline edit dialog using modal with generated inputs
+  const resSF = await authFetch('/standard-fields'); const sfs = await resSF.json();
+  const resC = await authFetch('/customers'); const customers = await resC.json();
+  const c = customers.find(x=>x.id===id); if(!c) return;
+  const body = ['<div class="flex-center-column" style="align-items:stretch">'];
+  sfs.forEach(f=>{
+    const v = (c.fields||{})[f.key]||'';
+    const label = f.key.charAt(0) + f.key.slice(1).toLowerCase().replace(/_/g, ' ');
+    if(f.type === 'text') body.push(`<input class="field-input" id="modalCF_${f.key}" placeholder="${label}" value="${v}" style="margin-bottom:8px">`);
+    else if(f.type === 'date') body.push(`<input type="date" class="field-input" id="modalCF_${f.key}" value="${v}" style="margin-bottom:8px">`);
+    else if(f.type === 'checkbox') body.push(`<label class="checkbox-label" style="margin-bottom:8px"><input type="checkbox" id="modalCF_${f.key}" ${v?'checked':''}> ${label}</label>`);
+  });
+  body.push('</div>');
+  const m = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = 'Kunde bearbeiten: ' + c.name;
+  document.getElementById('modalBody').innerHTML = body.join('');
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk'); const cancel = document.getElementById('modalCancel');
+  ok.onclick = async ()=>{
+    const fields = {}; sfs.forEach(f=>{
+      const el = document.getElementById('modalCF_'+f.key);
+      if(f.type === 'checkbox') fields[f.key] = el && el.checked;
+      else fields[f.key] = el ? el.value : '';
+    });
+    hideModal();
+    const res = await fetchWithOverlay('/customers/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields})}, 'Kunde wird gespeichert...');
+    const j = await res.json(); if(!res.ok) return showModal(j.error||'Fehler', 'error');
+    showModal('Kunde gespeichert', 'success'); customersLoad();
+  };
+  cancel.onclick = ()=>hideModal();
+}
+
+async function loadCustomersIntoSelect(){
+  const sel = document.getElementById('customerSelectPDF');
+  if(!sel) return;
+  
+  try {
+    const res = await authFetch('/customers');
+    if(!res.ok) {
+      sel.innerHTML = '<option value="">Kein Kunde</option>';
+      return;
+    }
+    const customers = await res.json();
+    sel.innerHTML = '<option value="">Kein Kunde</option>' + customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  } catch(e) {
+    console.error('Fehler beim Laden der Kunden:', e);
+    sel.innerHTML = '<option value="">Kein Kunde</option>';
+  }
+}
+
+async function onSelectCustomerForPDF(){
+  // when selecting a customer, prefill matching inputs in the PDF form
+  const sel = document.getElementById('customerSelectPDF');
+  if(!sel || !sel.value) return;
+  const res = await authFetch('/customers');
+  if(!res.ok) return;
+  const cs = await res.json();
+  const c = cs.find(x=>String(x.id)===String(sel.value));
+  if(!c) return;
+  const form = document.getElementById('dynamicPDFForm');
+  Object.entries(c.fields||{}).forEach(([k,v])=>{
+    const input = form.querySelector(`[name="${k}"]`);
+    if(input && input.type!=='checkbox'){ input.value = v; }
+  });
+}
+
+// upload input: show selected filename
+const uploadEl = document.getElementById('uploadFile');
+if(uploadEl){
+  uploadEl.addEventListener('change', e=>{
+    const f = e.target.files[0];
+    const nameEl = document.getElementById('uploadFileName');
+    if(nameEl) nameEl.textContent = f ? f.name : 'Keine Datei ausgewählt';
+  });
+}
+
+// --- modal helpers ---
+function showModal(message, type='info'){
+  const m = document.getElementById('modal');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const ok = document.getElementById('modalOk');
+  const cancel = document.getElementById('modalCancel');
+  title.textContent = type==='error' ? 'Fehler' : type==='success' ? 'Erfolg' : 'Info';
+  body.textContent = message;
+  m.dataset.type = type;
+  m.classList.remove('hidden');
+  // attach hide handlers so OK and Abbrechen close the modal
+  ok.onclick = hideModal;
+  cancel.onclick = hideModal;
+  ok.focus();
+}
+
+function hideModal(){
+  const m = document.getElementById('modal');
+  m.classList.add('hidden');
+}
+
+function showInputModal(title, placeholder, onConfirm){
+  const m = document.getElementById('modal');
+  const titleEl = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  titleEl.textContent = title;
+  body.innerHTML = `<div class="flex-center-column"><input id="modalInput" type="password" class="field-input" placeholder="${placeholder}" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" name="admin-password-set"></div>`;
+  m.dataset.type = 'input';
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk');
+  const cancel = document.getElementById('modalCancel');
+  ok.onclick = ()=>{ const v = document.getElementById('modalInput').value; hideModal(); onConfirm(v); };
+  cancel.onclick = ()=>{ hideModal(); };
+  setTimeout(()=>{ document.getElementById('modalInput').focus(); }, 50);
+}
+
+function showConfirm(message, onConfirm){
+  const m = document.getElementById('modal');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const ok = document.getElementById('modalOk');
+  const cancel = document.getElementById('modalCancel');
+  title.textContent = 'Bitte bestätigen';
+  body.textContent = message;
+  m.dataset.type = 'confirm';
+  m.classList.remove('hidden');
+  ok.onclick = ()=>{ hideModal(); onConfirm(); };
+  cancel.onclick = ()=>{ hideModal(); };
+  ok.focus();
+}
+
+// overlay helpers
+function showOverlay(msg){
+  const ov = document.getElementById('overlay');
+  const msgEl = document.getElementById('overlayMsg');
+  if(msgEl) msgEl.textContent = msg || 'Bitte warten...';
+  ov.classList.remove('hidden');
+}
+function hideOverlay(){
+  const ov = document.getElementById('overlay');
+  ov.classList.add('hidden');
+}
+async function fetchWithOverlay(url, options={}, message='Bitte warten...'){
+  // only show the overlay if the request takes longer than 1s to avoid jarring flashes
+  let overlayTimer = setTimeout(()=>showOverlay(message), 1000);
+  try{
+    const res = await authFetch(url, options);
+    return res;
+  }finally{ clearTimeout(overlayTimer); hideOverlay(); }
+}
+
+// load current user and start on pdf view
+async function loadCurrentUser(){
+  try{
+    const res = await authFetch('/me');
+    const user = await res.json();
+    document.getElementById('loginLink').classList.add('hidden');
+    const userDisplay = document.getElementById('userDisplay');
+    userDisplay.innerHTML = '<span class="icon" aria-hidden="true" style="margin-right:6px">\
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="1.6"/>\
+      <path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>\
+    </svg></span>' + user.username;
+    userDisplay.classList.remove('hidden');
+    document.getElementById('userActions').classList.remove('hidden');
+    document.getElementById('navAdmin').classList.toggle('hidden', !user.is_admin);
+    const navCustomers = document.getElementById('navCustomers');
+    if(navCustomers){ navCustomers.classList.remove('hidden'); }
+    return true;
+  }catch(e){
+    window.location.href = '/static/login.html';
+    return false;
+  }
+}
+
+async function logout(){
+  try{ await authFetch('/auth/logout', {method:'POST'}); }catch(e){}
+  window.location.href = '/static/login.html';
+}
+
+// --- admin UI actions ---
+async function adminLoadUsers(){
+  const res = await fetchWithOverlay('/admin/users', {}, 'Benutzer werden geladen...');
+  if(!res.ok) return showModal('Zugriff verweigert', 'error');
+  const users = await res.json();
+  const table = document.getElementById('adminUsersTable');
+  table.innerHTML = '<tr><th class="text-left">Benutzername</th><th>Rolle</th><th>2FA</th><th>Aktionen</th></tr>';
+  users.forEach(u=>{
+    const tr = document.createElement('tr');
+    const roleText = u.is_admin ? 'Administrator' : 'Benutzer';
+    const twofa = u.twofa_enabled ? 'Aktiv' : 'Nicht aktiv';
+    const actionsBtn = `<button class="icon-button" title="Mehr" onclick='adminOpenUserActions(${JSON.stringify({id:u.id,username:u.username,is_admin:u.is_admin,twofa_enabled:u.twofa_enabled})})'>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>
+    </button>`;
+    tr.innerHTML = `<td>${u.username}</td><td class="text-center">${roleText}</td><td class="text-center">${twofa}</td><td class="text-right">${actionsBtn}</td>`;
+    table.appendChild(tr);
+  });
+}
+
+function adminOpenUserActions(u){
+  const m = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = 'Aktionen für ' + u.username;
+  const body = [];
+  body.push('<div class="actions-list">');
+  body.push(`<button class="btn-primary full" onclick="hideModal(); adminResetPassword(${u.id})">Passwort setzen</button>`);
+  body.push(`<button class="btn-primary full" onclick='hideModal(); adminProvision2FA(${u.id}, ${JSON.stringify(u.username)})'>2FA einrichten</button>`);
+  body.push(`<button class="btn-delete full" onclick="hideModal(); adminReset2FA(${u.id})">2FA zurücksetzen</button>`);
+  if(!u.is_admin){ body.push(`<button class="btn-delete full" onclick="hideModal(); adminDeleteUser(${u.id})">Benutzer löschen</button>`); }
+  body.push('</div>');
+  document.getElementById('modalBody').innerHTML = body.join('');
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk'); const cancel = document.getElementById('modalCancel');
+  ok.onclick = hideModal; cancel.onclick = hideModal;
+}
+
+async function adminCreateUser(){
+  const username = document.getElementById('newUserUsername').value;
+  const password = document.getElementById('newUserPassword').value;
+  const is_admin = document.getElementById('newUserIsAdmin').checked;
+  if(!username) return showModal('Bitte Benutzernamen angeben', 'error');
+  const res = await fetchWithOverlay('/admin/users', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username,password,is_admin})}, 'Benutzer wird erstellt...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler beim Erstellen', 'error');
+  showModal('Benutzer erstellt', 'success');
+  document.getElementById('newUserUsername').value = '';
+  document.getElementById('newUserPassword').value = '';
+  document.getElementById('newUserIsAdmin').checked = false;
+  adminLoadUsers();
+}
+
+async function adminDeleteUser(id){
+  showConfirm('Benutzer wirklich löschen?', async ()=>{
+    const res = await fetchWithOverlay('/admin/users/' + id, {method:'DELETE'}, 'Benutzer wird gelöscht...');
+    if(!res.ok) return showModal('Löschen fehlgeschlagen', 'error');
+    showModal('Benutzer gelöscht', 'success');
+    adminLoadUsers();
+  });
+}
+
+async function adminResetPassword(id){
+  showInputModal('Passwort setzen', 'Neues Passwort', async (pw)=>{
+    if(!pw) return showModal('Bitte ein Passwort eingeben', 'error');
+    const res = await fetchWithOverlay('/admin/users/' + id + '/reset-password', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pw})}, 'Passwort wird gesetzt...');
+    const j = await res.json();
+    if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+    showModal('Passwort gesetzt', 'success');
+    adminLoadUsers();
+  });
+}
+
+async function adminReset2FA(id){
+  showConfirm('2FA für diesen Benutzer entfernen?', async ()=>{
+    const res = await fetchWithOverlay('/admin/users/' + id + '/reset-2fa', {method:'POST'}, '2FA wird entfernt...');
+    const j = await res.json();
+    if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+    showModal('2FA zurückgesetzt', 'success');
+    adminLoadUsers();
+  });
+}
+
+async function adminProvision2FA(id, username){
+  const res = await fetchWithOverlay('/admin/users/' + id + '/provision-2fa', {method:'POST'}, '2FA wird erstellt...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  showProvisionModal(username, j.secret, j.otpauth_url, j.qr);
+}
+
+function showProvisionModal(username, secret, otpauthUrl, qr){
+  const m = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = '2FA einrichten für ' + username;
+  document.getElementById('modalBody').innerHTML = `<div class="flex-center-column" style="width:100%"><div class="muted">QR-Code mit einer 2FA-App scannen.</div><img src="${qr}" alt="QR Code" style="max-width:200px;border:1px solid rgba(15,23,42,0.08);border-radius:10px;margin:8px auto"><div class="muted small" style="word-break:break-all">Secret: ${secret}</div><div class="muted small" style="word-break:break-all">otpauth URL: ${otpauthUrl}</div></div>`;
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk'); const cancel = document.getElementById('modalCancel');
+  ok.onclick = () => { hideModal(); adminLoadUsers(); };
+  cancel.onclick = () => { hideModal(); adminLoadUsers(); };
+}
+
+async function adminGetSettings(){
+  const res = await authFetch('/admin/settings');
+  if(!res.ok) return;
+  const j = await res.json();
+  document.getElementById('sessionLifetime').value = j.session_lifetime_days;
+  if(typeof j.temp_retention_hours !== 'undefined'){
+    document.getElementById('tempRetentionHours').value = j.temp_retention_hours;
+  }
+  if(typeof j.filename_pattern !== 'undefined'){
+    document.getElementById('filenamePattern').value = j.filename_pattern;
+  }
+}
+
+async function adminSaveSettings(){
+  const days = document.getElementById('sessionLifetime').value || 5;
+  const payload = {session_lifetime_days: days};
+  const res = await fetchWithOverlay('/admin/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}, 'Einstellungen werden gespeichert...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  showModal('Einstellungen gespeichert', 'success');
+}
+
+async function adminSaveFilenamePattern(){
+  const pattern = document.getElementById('filenamePattern').value || '';
+  const res = await fetchWithOverlay('/admin/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({filename_pattern: pattern})}, 'Einstellungen werden gespeichert...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  showModal('Dateiname Vorlage gespeichert', 'success');
+}
+
+async function adminSaveTempRetention(){
+  const retention = document.getElementById('tempRetentionHours').value || '';
+  if(!retention) return showModal('Bitte Stunden angeben', 'error');
+  const res = await fetchWithOverlay('/admin/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({temp_retention_hours: retention})}, 'Einstellungen werden gespeichert...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  showModal('Aufbewahrungsdauer gespeichert', 'success');
+}
+
+async function adminClearTemp(){
+  const res = await fetchWithOverlay('/admin/clear-temp', {method:'POST'}, 'Temp Ordner wird geleert...');
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler beim Leeren', 'error');
+  document.getElementById('adminClearTempResult').textContent = j.deleted + ' Dateien gelöscht';
+}
+
+// --- admin standard fields ---
+async function adminLoadStandardFields(){
+  const res = await authFetch('/admin/standard-fields');
+  if(!res.ok) return;
+  const fields = await res.json();
+  const tbl = document.getElementById('adminStdFieldsTable');
+  tbl.innerHTML = '<tr><th class="text-left">Schlüssel</th><th class="text-left">Typ</th><th class="text-right">Aktionen</th></tr>';
+  fields.forEach(f=>{
+    const typeText = f.type === 'text' ? 'Text' : f.type === 'date' ? 'Datum' : 'Checkbox';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${f.key}</td><td>${typeText}</td><td class="text-right"><button class="btn-primary" onclick="adminEditStandardField('${f.key}','${f.type}')">Bearbeiten</button> <button class="btn-delete" onclick="adminDeleteStandardField('${f.key}')">Löschen</button></td>`;
+    tbl.appendChild(tr);
+  });
+}
+
+async function adminAddStandardField(){
+  const keyEl = document.getElementById('newSFKey');
+  const typeEl = document.getElementById('newSFType');
+  let key = (keyEl.value||'').trim().toUpperCase();
+  const type = typeEl.value || 'text';
+  if(!key) return showModal('Bitte Schlüssel angeben', 'error');
+  const res = await fetchWithOverlay('/admin/standard-fields', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key, type})}, 'Feld wird hinzugefügt...');
+  const j = await res.json(); if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  keyEl.value=''; typeEl.value='text';
+  showModal('Standardfeld gespeichert', 'success');
+  adminLoadStandardFields();
+}
+
+async function adminDeleteStandardField(key){
+  showConfirm('Standardfeld wirklich löschen?', async ()=>{
+    const res = await fetchWithOverlay('/admin/standard-fields/' + encodeURIComponent(key), {method:'DELETE'}, 'Feld wird gelöscht...');
+    const j = await res.json().catch(()=>({error:'Fehler'})); if(!res.ok) return showModal(j.error||'Fehler', 'error');
+    showModal('Standardfeld gelöscht', 'success'); adminLoadStandardFields();
+  });
+}
+
+async function adminEditStandardField(key, currentType){
+  const m = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = 'Standardfeld bearbeiten';
+  document.getElementById('modalBody').innerHTML = `<div class="flex-center-column"><div class="muted" style="width:100%">Schlüssel: ${key}</div><select id="modalSFType" class="field-input" style="margin-top:8px"><option value="text" ${currentType==='text'?'selected':''}>Text</option><option value="date" ${currentType==='date'?'selected':''}>Datum</option><option value="checkbox" ${currentType==='checkbox'?'selected':''}>Checkbox</option></select></div>`;
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk'); const cancel = document.getElementById('modalCancel');
+  ok.onclick = async ()=>{
+    const type = document.getElementById('modalSFType').value;
+    hideModal();
+    const res = await fetchWithOverlay('/admin/standard-fields', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key, type})}, 'Feld wird gespeichert...');
+    const j = await res.json(); if(!res.ok) return showModal(j.error||'Fehler', 'error');
+    showModal('Standardfeld gespeichert', 'success'); adminLoadStandardFields();
+  };
+  cancel.onclick = ()=>hideModal();
+}
+
+// PDF preview actions
+async function saveGeneratedPdf(){
+  if(window.currentGeneratedDocId){ return documentsSave(window.currentGeneratedDocId); }
+  if(!currentGeneratedId) return;
+  try{
+    const res = await authFetch('/generated/' + encodeURIComponent(currentGeneratedId) + '?download=1');
+    if(!res.ok) return showModal('Fehler beim Herunterladen der Datei', 'error');
+    const blob = await res.blob();
+    const filename = currentGeneratedName || 'document.pdf';
+    // Try File System Access API if available
+    if(window.showSaveFilePicker){
+      try{
+        const opts = [{description:'PDF', accept: {'application/pdf': ['.pdf']}}];
+        const handle = await window.showSaveFilePicker({suggestedName: filename, types: opts});
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        showModal('Datei gespeichert', 'success');
+        return;
+      }catch(e){
+        // user may have cancelled; fall back to download
+      }
+    }
+    // fallback: try msSaveOrOpenBlob (IE/Edge) then anchor
+    if(window.navigator && window.navigator.msSaveOrOpenBlob){
+      try{ window.navigator.msSaveOrOpenBlob(blob, filename); return; }catch(e){}
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }catch(e){ showModal('Fehler beim Speichern der Datei', 'error'); }
+}
+async function deleteGeneratedPdf(){
+  if(window.currentGeneratedDocId){
+    const id = window.currentGeneratedDocId;
+    const res = await fetchWithOverlay('/documents/' + id, {method:'DELETE'}, 'Dokument wird gelöscht...');
+    const j = await res.json().catch(()=>({error:'Löschen fehlgeschlagen'}));
+    if(!res.ok) return showModal(j.error || 'Löschen fehlgeschlagen', 'error');
+    showModal('Dokument gelöscht', 'success');
+  }else{
+    if(!currentGeneratedId) return;
+    const res = await fetchWithOverlay('/generated/' + encodeURIComponent(currentGeneratedId), {method:'DELETE'}, 'Datei wird gelöscht...');
+    const j = await res.json().catch(()=>({error:'Löschen fehlgeschlagen'}));
+    if(!res.ok) return showModal(j.error || 'Löschen fehlgeschlagen', 'error');
+    showModal('Generierte Datei gelöscht', 'success');
+  }
+  document.getElementById('pdfPreview').classList.add('hidden');
+  currentGeneratedId = null;
+  window.currentGeneratedDocId = null;
+  document.getElementById('pdfPreviewFrame').src = '';
+}
+
+function printGeneratedPdf(){
+  if(window.currentGeneratedDocId){ const url = '/documents/'+window.currentGeneratedDocId+'/file'; openPdfInViewerAndPrint(url); return; }
+  if(!currentGeneratedId) return showModal('Kein PDF vorhanden', 'error');
+  const url = '/generated/' + encodeURIComponent(currentGeneratedId);
+  openPdfInViewerAndPrint(url);
+}
+
+// --- Autosave helpers for PDF form drafts ---
+function getPdfDraftKey(template){ return 'pdfDraft:' + template; }
+function attachPdfAutosave(template){
+  const form = document.getElementById('dynamicPDFForm'); if(!form) return;
+  const handler = ()=>{ savePdfDraft(template); };
+  form.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+}
+function savePdfDraft(template){
+  const form = document.getElementById('dynamicPDFForm'); if(!form) return;
+  const obj = {};
+  form.querySelectorAll('input,select,textarea').forEach(el=>{
+    if(el.name){ obj[el.name] = (el.type==='checkbox') ? el.checked : el.value; }
+  });
+  const custSel = document.getElementById('customerSelectPDF');
+  obj['__customerId'] = custSel ? custSel.value : '';
+  try{ localStorage.setItem(getPdfDraftKey(template), JSON.stringify(obj)); }catch(e){ /* ignore quota errors */ }
+}
+function restorePdfDraft(template){
+  let raw = null; try{ raw = localStorage.getItem(getPdfDraftKey(template)); }catch(e){ raw = null; }
+  if(!raw) return;
+  try{
+    const obj = JSON.parse(raw);
+    const form = document.getElementById('dynamicPDFForm'); if(!form) return;
+    Object.entries(obj).forEach(([k,v])=>{
+      if(k==='__customerId'){
+        const sel = document.getElementById('customerSelectPDF');
+        if(sel){ sel.value = v || ''; onSelectCustomerForPDF(); }
+        return;
+      }
+      const el = form.querySelector('[name="' + k + '"]');
+      if(el){ if(el.type==='checkbox') el.checked = !!v; else el.value = v; }
+    });
+  }catch(e){ /* ignore parse errors */ }
+}
+function clearPdfDraft(template){ try{ localStorage.removeItem(getPdfDraftKey(template)); }catch(e){ /* ignore */ } }
+
+
+// load current user on start
+loadCurrentUser().then((ok)=>{
+  // if admin view is visible, pre-load admin data
+  if(!document.getElementById('navAdmin').classList.contains('hidden')){
+    adminGetSettings();
+  }
+  switchView('pdf');
+});
+
+// --- Documents view logic ---
+async function documentsInit(){
+  // load filter options and initial list
+  try{
+    const [tRes, cRes, uRes] = await Promise.all([
+      authFetch('/templates'), authFetch('/customers'), authFetch('/users')
+    ]);
+    const tpls = await tRes.json();
+    const custs = await cRes.json();
+    const users = await uRes.json();
+    const tSel = document.getElementById('docFilterTemplate');
+    const cSel = document.getElementById('docFilterCustomer');
+    const uSel = document.getElementById('docFilterUser');
+    tSel.innerHTML = '<option value="">Alle Vorlagen</option>' + tpls.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+    cSel.innerHTML = '<option value="">Alle Kunden</option>' + custs.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    uSel.innerHTML = '<option value="">Alle Benutzer</option>' + users.map(u=>`<option value="${u.id}">${u.username}</option>`).join('');
+  }catch(e){ /* ignore */ }
+  documentsLoad();
+}
+
+let documentsLoadTimer;
+function documentsLoadDebounced(){ clearTimeout(documentsLoadTimer); documentsLoadTimer = setTimeout(()=>documentsLoad(), 200); }
+
+async function documentsLoad(){
+  const q = document.getElementById('docSearch').value.trim();
+  const cust = document.getElementById('docFilterCustomer').value;
+  const tpl = document.getElementById('docFilterTemplate').value;
+  const usr = document.getElementById('docFilterUser').value;
+  const params = [];
+  if(q) params.push('q='+encodeURIComponent(q));
+  if(cust) params.push('customer_id='+encodeURIComponent(cust));
+  if(tpl) params.push('template_name='+encodeURIComponent(tpl));
+  if(usr) params.push('user_id='+encodeURIComponent(usr));
+  const url = '/documents' + (params.length ? ('?'+params.join('&')) : '');
+  const res = await authFetch(url);
+  if(!res.ok) return;
+  const list = await res.json();
+  const table = document.getElementById('documentsTable');
+  table.innerHTML = '<tr><th class="text-left">Code</th><th class="text-left">Dateiname</th><th class="text-left">Vorlage</th><th class="text-left">Kunde</th><th class="text-left">Benutzer</th><th class="text-left">Erstellt</th><th class="text-right">Mehr</th></tr>';
+  list.forEach(d=>{
+    const tr = document.createElement('tr');
+    const date = d.generated_at ? new Date(d.generated_at).toLocaleString() : '';
+    const moreBtn = `<button class="icon-button" title="Mehr" onclick="documentsOpenActions(${d.id}, '${(d.file_name||'').replace(/'/g, "&#39;")}')"><svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'><circle cx='5' cy='12' r='1.6' fill='currentColor'/><circle cx='12' cy='12' r='1.6' fill='currentColor'/><circle cx='19' cy='12' r='1.6' fill='currentColor'/></svg></button>`;
+    tr.innerHTML = `<td><button class="link-button" onclick="documentsShowDetail(${d.id})">${d.code||('PDF-'+d.id)}</button></td><td>${d.file_name||''}</td><td>${d.template_name||''}</td><td>${d.customer_name||''}</td><td>${d.username||''}</td><td>${date}</td><td class=\"text-right\">${moreBtn}</td>`;
+    table.appendChild(tr);
+  });
+  // details are shown in a drawer; nothing inline to update
+}
+
+async function documentsShowDetail(id){
+  const res = await authFetch('/documents/' + id);
+  const j = await res.json();
+  if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+  documentsOpenDrawer(j);
+}
+
+function documentsOpenActions(id, fileName){
+  const m = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = 'Aktionen';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="actions-list">
+      <button class="btn-delete full" onclick="hideModal(); documentsDelete(${id})">Dokument löschen</button>
+    </div>`;
+  m.classList.remove('hidden');
+  const ok = document.getElementById('modalOk'); const cancel = document.getElementById('modalCancel');
+  ok.onclick = hideModal; cancel.onclick = hideModal;
+}
+
+async function documentsDelete(id){
+  showConfirm('Dokument wirklich löschen?', async ()=>{
+    const res = await fetchWithOverlay('/documents/' + id, {method:'DELETE'}, 'Dokument wird gelöscht...');
+    const j = await res.json().catch(()=>({error:'Fehler'}));
+    if(!res.ok) return showModal(j.error || 'Fehler', 'error');
+    showModal('Dokument gelöscht', 'success');
+    documentsLoad();
+    closeDocDrawer();
+  });
+}
+
+function documentsOpenDrawer(doc){
+  // Create drawer if not exists
+  let drawer = document.getElementById('docDrawer');
+  if(!drawer){
+    const el = document.createElement('div'); el.id = 'docDrawer'; el.className = 'modal'; el.classList.add('hidden');
+    el.innerHTML = `<div id=\"docDrawerCard\" class=\"modal-card\" style=\"max-width:980px;width:92vw;\">
+    <h3 id=\"docDrawerTitle\">Dokument</h3>
+    <div id=\"docDrawerBody\" class=\"modal-body\" style=\"max-height:72vh;overflow:auto\"></div>
+    <div class=\"modal-actions\">
+    <button class=\"secondary\" onclick=\"closeDocDrawer()\">Schliessen</button>
+    <span style=\"flex:1\"></span>
+    <button class=\"secondary\" onclick=\"documentsPrint(${doc.id})\">Öffnen</button>
+    <button class=\"btn-primary\" onclick=\"documentsSave(${doc.id})\">Speichern</button>
+    </div>
+  </div>`;
+    document.body.appendChild(el);
+  }
+  const body = document.getElementById('docDrawerBody');
+  const date = doc.generated_at ? new Date(doc.generated_at).toLocaleString() : '';
+  const fieldsRows = Object.entries(doc.fields||{}).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  // Structured two-column meta grid + fields + preview
+  body.innerHTML = `
+    <div class=\"stack\" style=\"gap:16px\">
+      <div>
+        <h4 style=\"margin:0 0 6px 0\">Metadaten</h4>
+        <div class=\"grid\" style=\"grid-template-columns: 180px 1fr; gap: 8px 14px\">
+          <div class=\"muted small\">Code</div><div><strong>${doc.code || ('PDF-'+doc.id)}</strong></div>
+          <div class=\"muted small\">Dateiname</div><div>${doc.file_name || ''}</div>
+          <div class=\"muted small\">Vorlage</div><div>${doc.template_name || ''}</div>
+          <div class=\"muted small\">Kunde</div><div>${(doc.customer && doc.customer.name) || ''}</div>
+          <div class=\"muted small\">Benutzer</div><div>${(doc.user && doc.user.username) || ''}</div>
+          <div class=\"muted small\">Erstellt</div><div>${date}</div>
+        </div>
+      </div>
+      <div>
+        <h4 style=\"margin:8px 0 6px 0\">Felder</h4>
+        <table style=\"width:100%\"><tr><th class=\"text-left\">Feld</th><th class=\"text-left\">Wert</th></tr>${fieldsRows || '<tr><td colspan=\"2\" class=\"muted small\">Keine Felder</td></tr>'}</table>
+      </div>
+      <div>
+        <h4 style=\"margin:8px 0 6px 0\">Vorschau</h4>
+        <iframe class=\"preview-frame\" src=\"${doc.preview_url || ''}\" style=\"height:60vh\"></iframe>
+      </div>
+    </div>`;
+  const drawerEl = document.getElementById('docDrawer');
+  drawerEl.classList.remove('hidden');
+}
+
+function closeDocDrawer(){ const drawer = document.getElementById('docDrawer'); if(drawer) drawer.classList.add('hidden'); }
+
+async function documentsSave(id){
+  try{
+    const res = await authFetch('/documents/' + id + '/file');
+    if(!res.ok){ const j = await res.json().catch(()=>({})); return showModal(j.error || 'Fehler beim Herunterladen', 'error'); }
+    const blob = await res.blob();
+    const meta = await authFetch('/documents/'+id).then(r=>r.json()).catch(()=>({}));
+    const filename = meta.file_name || ('document-'+id+'.pdf');
+    if(window.showSaveFilePicker){
+      try{
+        const handle = await window.showSaveFilePicker({suggestedName: filename, types:[{description:'PDF',accept:{'application/pdf':['.pdf']}}]});
+        const w = await handle.createWritable(); await w.write(blob); await w.close(); showModal('Datei gespeichert', 'success'); return;
+      }catch(e){}
+    }
+    if(window.navigator && window.navigator.msSaveOrOpenBlob){ try{ window.navigator.msSaveOrOpenBlob(blob, filename); return; }catch(e){} }
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 3000);
+  }catch(e){ showModal('Fehler beim Speichern', 'error'); }
+}
+
+function openPdfInViewerAndPrint(fileUrl){
+  // Open the PDF directly in a new tab without downloading or auto-printing
+  window.open(fileUrl, '_blank');
+}
+function documentsPrint(id){ openPdfInViewerAndPrint('/documents/'+id+'/file'); }
+</script>
+
+<!-- Global overlay spinner / status -->
+<div id="overlay" class="overlay hidden" aria-hidden="true">
+  <div class="overlay-content card">
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="overlay-msg muted" id="overlayMsg">Bitte warten...</div>
+  </div>
+</div>
+
+<!-- Modal (single shared for info / confirm) -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <h3 id="modalTitle">Info</h3>
+    <div id="modalBody" class="modal-body">Nachricht</div>
+    <div class="modal-actions">
+      <button id="modalCancel" class="secondary">Abbrechen</button>
+      <button id="modalOk" class="btn-primary">OK</button>
+    </div>
+  </div>
+</div> 
+
+</body>
+</html>
