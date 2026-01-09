@@ -1598,26 +1598,7 @@ class PDFGenerator:
             except Exception:
                 pass
 
-        # Primary: Use unoconv (Linux/Mac) - fastest pure Python-free method
-        try:
-            result = subprocess.run([
-                'unoconv',
-                '-f', 'pdf',
-                '-o', str(pdf_path),
-                str(docx_path)
-            ], capture_output=True, text=True, timeout=30)
-            if result.returncode == 0 and pdf_path.exists():
-                return
-            # If unoconv succeeded but file doesn't exist at exact path, it might be elsewhere
-            temp_pdf = docx_path.with_suffix('.pdf')
-            if temp_pdf.exists() and temp_pdf != pdf_path:
-                import shutil
-                shutil.move(str(temp_pdf), str(pdf_path))
-                return
-        except Exception:
-            pass
-
-        # Fallback: soffice/libreoffice headless (Linux/Mac/Windows)
+        # Primary: Use soffice/libreoffice headless (works in Docker/linux)
         try:
             result = subprocess.run([
                 'soffice',
@@ -1625,15 +1606,14 @@ class PDFGenerator:
                 '--convert-to', 'pdf',
                 '--outdir', str(pdf_path.parent),
                 str(docx_path)
-            ], capture_output=True, text=True, timeout=30)
+            ], capture_output=True, text=True, timeout=45)
             if result.returncode == 0:
-                # LibreOffice converts to basename.pdf
                 generated_pdf = pdf_path.parent / (docx_path.stem + '.pdf')
                 if generated_pdf.exists() and generated_pdf != pdf_path:
                     import shutil
                     shutil.move(str(generated_pdf), str(pdf_path))
                     return
-                elif generated_pdf.exists():
+                if generated_pdf.exists():
                     return
         except Exception:
             pass
@@ -1645,7 +1625,7 @@ class PDFGenerator:
             convert(docx_str, pdf_str)
             return
         except Exception as e:
-            raise Exception(f'PDF conversion failed. Install LibreOffice or unoconv for Linux/Docker. Error: {str(e)}')
+            raise Exception(f'PDF conversion failed. LibreOffice is required in Docker/Linux. Error: {str(e)}')
     
     @classmethod
     def worker(cls, task_id: str, template_docx: Path, template_meta: Dict[str, Any],
