@@ -6,7 +6,7 @@ sqlalchemy==2.0.23
 passlib[argon2]==1.7.4
 python-multipart==0.0.6
 docxtpl==0.16.7
-docx2pdf==1.5.0
+docx2pdf==0.1.8
 pyotp==2.9.0
 qrcode[pil]==7.4.2
 Pillow==10.1.0

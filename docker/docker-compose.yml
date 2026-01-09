@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   vorlagen-app:
     build:
@@ -9,26 +7,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # Database configuration
       DATABASE_URL: sqlite:////app/data/data.db
-      # Directory configuration
       TEMPLATE_DIR: /app/templates
       TEMP_DIR: /app/temp
       ARCHIVE_DIR: /app/archive
-      # Application settings
       SESSION_LIFETIME_DAYS: 5
       TEMP_RETENTION_HOURS: 48
-    volumes:
-      # Persist database
-      - vorlagen-data:/app/data
-      # Persist generated documents archive
-      - vorlagen-archive:/app/archive
-      # Persist temporary files (optional, can be cleared)
-      - vorlagen-temp:/app/temp
-      # Keep templates directory (for easy updates)
-      - vorlagen-templates:/app/templates
-      # Keep static files
-      - vorlagen-static:/app/static
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
@@ -36,15 +20,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
-volumes:
-  vorlagen-data:
-    driver: local
-  vorlagen-archive:
-    driver: local
-  vorlagen-temp:
-    driver: local
-  vorlagen-templates:
-    driver: local
-  vorlagen-static:
-    driver: local

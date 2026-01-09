@@ -1,5 +1,5 @@
 # Multi-stage build for optimal image size
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Install system dependencies for PDF conversion and document handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
