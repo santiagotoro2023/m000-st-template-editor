@@ -49,7 +49,7 @@ FastAPI Application (app.py)
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/vorlagen-editor.git
+git clone https://github.com/santiagotoro2023/m000-st-template-editor.git
 cd vorlagen-editor
 ```
 
