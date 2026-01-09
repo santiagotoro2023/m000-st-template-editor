@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python virtual environments
+venv/
+env/
+.venv
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Runtime data that shouldn't be in image
+data.db
+*.db
+*.sqlite
+*.sqlite3
+temp/*
+!temp/.gitkeep
+archive/*
+!archive/.gitkeep
+
+# OS files
+Thumbs.db
+
+# Environment files (use Docker env variables instead)
+.env
+.env.local
+
+# CI/CD
+.github/
