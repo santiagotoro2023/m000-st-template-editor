@@ -1599,24 +1599,38 @@ class PDFGenerator:
                 # Fallback below
                 pass
 
-        # Fallback: Direct conversion without heavy handling
+        # Fallback 1: Try LibreOffice (works on Linux/Windows without Word)
+        try:
+            result = subprocess.run([
+                'libreoffice',
+                '--headless',
+                '--convert-to', 'pdf',
+                '--outdir', str(pdf_path.parent),
+                str(docx_path)
+            ], capture_output=True, text=True, timeout=30)
+            if result.returncode == 0 and pdf_path.exists():
+                return
+        except Exception:
+            pass
+
+        # Fallback 2: docx2pdf (requires Microsoft Word)
         docx_str = str(docx_path)
         pdf_str = str(pdf_path)
         try:
             convert(docx_str, pdf_str)
         except Exception as e:
             err_str = str(e)
-            if 'CoInitialize' in err_str or 'com' in err_str.lower():
+            # Last resort: try subprocess docx2pdf
+            if 'not implemented' not in err_str.lower():
                 cmd = [
                     sys.executable,
                     '-c',
                     f"from docx2pdf import convert; convert(r'{docx_str}', r'{pdf_str}')"
                 ]
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-                if result.returncode != 0:
-                    raise Exception(f'Conversion failed: {result.stderr or result.stdout}')
-            else:
-                raise
+                if result.returncode == 0:
+                    return
+            raise Exception(f'PDF conversion failed (LibreOffice not available or docx2pdf not supported): {err_str}')
     
     @classmethod
     def worker(cls, task_id: str, template_docx: Path, template_meta: Dict[str, Any],
