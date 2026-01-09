@@ -6,7 +6,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice \
     libreoffice-calc \
     libreoffice-impress \
+    fontconfig \
+    fonts-dejavu \
+    fonts-liberation \
+    wget \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Space Grotesk font (Google Fonts) and refresh font cache
+RUN mkdir -p /usr/local/share/fonts/space-grotesk && \
+    wget -q https://github.com/google/fonts/raw/main/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf \
+         -O /usr/local/share/fonts/space-grotesk/SpaceGrotesk.ttf && \
+    fc-cache -f -v
 
 WORKDIR /app
 
