@@ -1590,47 +1590,62 @@ class PDFGenerator:
     @staticmethod
     def convert_to_pdf_fast(docx_path: Path, pdf_path: Path) -> None:
         """Optimized DOCX to PDF conversion"""
-        # Prefer persistent Word converter if available; fallback quickly on issues
+        # Prefer persistent Word converter if available (Windows only)
         if WordConverter.is_available():
             try:
                 WordConverter.convert(docx_path, pdf_path, timeout=8)
                 return
             except Exception:
-                # Fallback below
                 pass
 
-        # Fallback 1: Try LibreOffice (works on Linux/Windows without Word)
+        # Primary: Use unoconv (Linux/Mac) - fastest pure Python-free method
         try:
             result = subprocess.run([
-                'libreoffice',
+                'unoconv',
+                '-f', 'pdf',
+                '-o', str(pdf_path),
+                str(docx_path)
+            ], capture_output=True, text=True, timeout=30)
+            if result.returncode == 0 and pdf_path.exists():
+                return
+            # If unoconv succeeded but file doesn't exist at exact path, it might be elsewhere
+            temp_pdf = docx_path.with_suffix('.pdf')
+            if temp_pdf.exists() and temp_pdf != pdf_path:
+                import shutil
+                shutil.move(str(temp_pdf), str(pdf_path))
+                return
+        except Exception:
+            pass
+
+        # Fallback: soffice/libreoffice headless (Linux/Mac/Windows)
+        try:
+            result = subprocess.run([
+                'soffice',
                 '--headless',
                 '--convert-to', 'pdf',
                 '--outdir', str(pdf_path.parent),
                 str(docx_path)
             ], capture_output=True, text=True, timeout=30)
-            if result.returncode == 0 and pdf_path.exists():
-                return
+            if result.returncode == 0:
+                # LibreOffice converts to basename.pdf
+                generated_pdf = pdf_path.parent / (docx_path.stem + '.pdf')
+                if generated_pdf.exists() and generated_pdf != pdf_path:
+                    import shutil
+                    shutil.move(str(generated_pdf), str(pdf_path))
+                    return
+                elif generated_pdf.exists():
+                    return
         except Exception:
             pass
 
-        # Fallback 2: docx2pdf (requires Microsoft Word)
+        # Last resort: docx2pdf (Windows with Word only)
         docx_str = str(docx_path)
         pdf_str = str(pdf_path)
         try:
             convert(docx_str, pdf_str)
+            return
         except Exception as e:
-            err_str = str(e)
-            # Last resort: try subprocess docx2pdf
-            if 'not implemented' not in err_str.lower():
-                cmd = [
-                    sys.executable,
-                    '-c',
-                    f"from docx2pdf import convert; convert(r'{docx_str}', r'{pdf_str}')"
-                ]
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-                if result.returncode == 0:
-                    return
-            raise Exception(f'PDF conversion failed (LibreOffice not available or docx2pdf not supported): {err_str}')
+            raise Exception(f'PDF conversion failed. Install LibreOffice or unoconv for Linux/Docker. Error: {str(e)}')
     
     @classmethod
     def worker(cls, task_id: str, template_docx: Path, template_meta: Dict[str, Any],
